@@ -4,10 +4,6 @@
 # addresses of the reciever and the sender,
 # and it will have the subject of the email.
 
-# To improve this function in the future, I
-# will add the functionality to find the times
-# of the emails. 
-
 # Requires imapclient, imaplib, pyzmail, openpyxl, pprint, re
 
 def getAddAndSub(username,pword,hostAddress):
