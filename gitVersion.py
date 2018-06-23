@@ -135,8 +135,8 @@ def insertEmailData(emailData,path):
 # ========================================== #
 print('Welcome to the turnaround time analyzer! Please enter the password to begin.')
 pw = input()
-address = 'joe.grosso@cogeco.ca'
-plug = 'imap.cogeco.ca'
+address = 'example@gmail.com'
+plug = 'imap.gmail.com'
 data = getAddAndSub(address,pw,plug)
 path = createNewXlsx()
 insertEmailData(data,path)
