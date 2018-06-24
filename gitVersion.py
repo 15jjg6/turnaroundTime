@@ -8,12 +8,9 @@
 # * sent and recieve times
 # * response time
 
-# Requires imapclient, imaplib, pyzmail, openpyxl, pprint, re
+# Requires imapclient, imaplib, pyzmail, openpyxl, pprint, re, datetime
 
 def getAddAndSub(username,pword,hostAddress):
-
-    # Check these libraries to see which ones are redundant. 
-
 
     # Increases the max allowed size of program to 10,000,000
     # bytes, much less likely to get this error:
@@ -36,6 +33,14 @@ def getAddAndSub(username,pword,hostAddress):
             print('The password is incorrect. Please run the program again.')
             input()
             raise SystemExit
+        
+#        except TimeoutError:
+#            print('''The connection attempt failed because the connected
+#host has failed to respond.
+#Please check the name of your IMAP mail server and try again.''')
+#            input()
+#            raise SystemExit
+                  
         client.select_folder('INBOX',readonly=True)
 
         # Aquire the message #'s of all messages in the inbox.
@@ -47,11 +52,6 @@ def getAddAndSub(username,pword,hostAddress):
         import pyzmail
 
         for i in range(length):   
-            # Consider cleaning this part up. Copying the entire
-            # cache of emails is gonna take a lot of time. Is there
-            # any way I can reduce the amount of info needed to be
-            # copied? (Took about 45 seconds to run with 137 emails.)
-            
             info.append(['','','','','','',''])
             rawMessages = client.fetch(messages[i], ['BODY[]'])
             legibleMessage = pyzmail.PyzMessage.factory(rawMessages[messages[i]][b'BODY[]'])
@@ -102,6 +102,7 @@ What do you want to name this file?''')
     sheet['D1'] = 'Subject Line'
     sheet['E1'] = 'Quote Request Date/Time'
     sheet['F1'] = 'Quote Response Date/Time'
+    sheet['G1'] = 'Turnaround [HR:MIN:SEC]'
     
     try:
         wb.save(path + '\\' + fileName + '.xlsx')
@@ -133,7 +134,7 @@ def insertEmailData(emailData,path):
     while 1:
         try:
             wb.save(path[1])
-            print("\nThe excel file has been prepared at the chosen address.\nPress enter to exit.")
+            print("\nThe excel file has been prepared at the chosen address.\nPress enter to exit the program.")
             input()
             break
         except PermissionError:
@@ -154,3 +155,5 @@ print('# ========================================== #')
 data = getAddAndSub(address,pw,plug)
 path = createNewXlsx()
 insertEmailData(data,path)
+
+
