@@ -6,6 +6,7 @@
 # * reciever and sender addresses 
 # * subject line
 # * sent and recieve times
+# * response time
 
 # Requires imapclient, imaplib, pyzmail, openpyxl, pprint, re
 
@@ -25,6 +26,7 @@ def getAddAndSub(username,pword,hostAddress):
     originalDateRegex = re.compile(r'Sent: ((Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day, (January|February|March|April|May|June|July|August|September|October|November|December) (\d\d|\d), \d\d\d\d (\d\d|\d):\d\d (A|P)M)')
 
     import imapclient
+    from datetime import datetime
     with imapclient.IMAPClient(host=hostAddress) as client:
 
         # Login and access the inbox.
@@ -43,13 +45,14 @@ def getAddAndSub(username,pword,hostAddress):
         print('Your password was correct. Looking through ' + str(length) + ' emails...')
         info = []
         import pyzmail
+
         for i in range(length):   
             # Consider cleaning this part up. Copying the entire
             # cache of emails is gonna take a lot of time. Is there
             # any way I can reduce the amount of info needed to be
             # copied? (Took about 45 seconds to run with 137 emails.)
             
-            info.append(['','','','','',''])
+            info.append(['','','','','','',''])
             rawMessages = client.fetch(messages[i], ['BODY[]'])
             legibleMessage = pyzmail.PyzMessage.factory(rawMessages[messages[i]][b'BODY[]'])
 
@@ -60,10 +63,12 @@ def getAddAndSub(username,pword,hostAddress):
             info[i][1] = legibleMessage.get_address('from')
             info[i][2] = legibleMessage.get_address('to')
             info[i][3] = legibleMessage.get_subject()
+            info[i][5] = datetime.strptime(exitDate.group(1), '%a, %d %b %Y %H:%M:%S %z')
+
             if recieveDate != None:
-                info[i][4] = str(recieveDate.group(1))
-            info[i][5] = exitDate.group(1)
-            # Only transcribes the email of the first recipient.
+                info[i][4] = datetime.strptime(str(recieveDate.group(1)) + ' -0400', '%A, %B %d, %Y %I:%M %p %z')
+                info[i][6] = info[i][5] - info[i][4]
+            
             if (i + 1) % 10 == 0 and (i + 1) != length:
                 print(str(i + 1) + '/' + str(length) + ' messages analyzed.')
         client.logout()
@@ -102,7 +107,9 @@ What do you want to name this file?''')
         wb.save(path + '\\' + fileName + '.xlsx')
         print('\nThe file ' + fileName + '.xslx has been saved in the above folder.')
     except PermissionError:
-        print('\nThere is another file in the same folder with the same name that is open.\nClose the file and try again if you are okay with saving over it.')
+        print('''
+***Another file with the same name is open!***
+Close the file and try again if you are okay with saving over it.''')
         createNewXlsx()
     fileAndPath = [path + '\\', fileName + '.xlsx']
     return fileAndPath
@@ -113,7 +120,6 @@ def insertEmailData(emailData,path):
     wb = openpyxl.load_workbook(path[0] + path[1])
     sheet = wb['Sheet']
 
-    print('\nExcel file opened.')
     for i in range(len(emailData)):
         for j in range(len(emailData[i])):
             cell = chr(65 + j) + str(i + 2)
@@ -127,14 +133,13 @@ def insertEmailData(emailData,path):
     while 1:
         try:
             wb.save(path[1])
-            print("The excel file has been prepared at the chosen address.")
+            print("\nThe excel file has been prepared at the chosen address.")
             input()
             break
         except PermissionError:
             print('The excel file is open. Please close the file and press enter to try again.')
             input()
             
-
 # Run this section as a test.
 # ========================================== #
 print('Welcome to the turnaround time analyzer! Please enter the password to begin.')
@@ -145,4 +150,3 @@ data = getAddAndSub(address,pw,plug)
 path = createNewXlsx()
 insertEmailData(data,path)
 # ========================================== #
-
