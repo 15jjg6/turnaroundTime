@@ -133,20 +133,24 @@ def insertEmailData(emailData,path):
     while 1:
         try:
             wb.save(path[1])
-            print("\nThe excel file has been prepared at the chosen address.")
+            print("\nThe excel file has been prepared at the chosen address.\nPress enter to exit.")
             input()
             break
         except PermissionError:
             print('The excel file is open. Please close the file and press enter to try again.')
             input()
             
-# Run this section as a test.
-# ========================================== #
-print('Welcome to the turnaround time analyzer! Please enter the password to begin.')
+print('''# ========================================== #
+Welcome to the turnaround time analyzer!
+Enter the name of your IMAP mail server.''')
+plug = input()
+print('\nNext, enter the email you want to analyze.')
+address = input()
+print('\nFinally, enter your password.')
 pw = input()
-address = 'example@gmail.com'
-plug = 'imap.gmail.com'
+print("\nLet's try that.")
+print('# ========================================== #')
+
 data = getAddAndSub(address,pw,plug)
 path = createNewXlsx()
 insertEmailData(data,path)
-# ========================================== #
