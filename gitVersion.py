@@ -32,6 +32,7 @@ def getAddAndSub(username,pword,hostAddress):
             client.login(username,pword)
         except imaplib.IMAP4.error:
             print('The password is incorrect. Please run the program again.')
+            input()
             raise SystemExit
         client.select_folder('INBOX',readonly=True)
 
@@ -75,11 +76,15 @@ def getAddAndSub(username,pword,hostAddress):
 def createNewXlsx():
     import os
 
-    print('''\nYour new excel file with the turnaround data will be created next to this python script. What do you want to name this file?
+    print('''
+Your new excel file with the email data will be
+created in the same folder as this python script.
+Make sure this .xlsx doesn't share a name as 
+another .xlsx in the same folder.
 
-Make sure this file doesn't have the same name as another excel spreadsheet in the same folder if you want to keep the old one, the script will save over it!''')
+What do you want to name this file?''')
     fileName = input()
-    print('Lets try that.')
+    print('\nLets try that.')
     path = str(os.getcwd())
     print('The current file path is "' + path + '"')
 
@@ -95,9 +100,9 @@ Make sure this file doesn't have the same name as another excel spreadsheet in t
     
     try:
         wb.save(path + '\\' + fileName + '.xlsx')
-        print('The file ' + fileName + '.xslx has been saved in the above folder.')
+        print('\nThe file ' + fileName + '.xslx has been saved in the above folder.')
     except PermissionError:
-        print('There is another file in the same folder with the same name that is open.\nClose the file and try again if you are okay with saving over it.')
+        print('\nThere is another file in the same folder with the same name that is open.\nClose the file and try again if you are okay with saving over it.')
         createNewXlsx()
     fileAndPath = [path + '\\', fileName + '.xlsx']
     return fileAndPath
@@ -106,7 +111,6 @@ Make sure this file doesn't have the same name as another excel spreadsheet in t
 def insertEmailData(emailData,path):
     import openpyxl
     wb = openpyxl.load_workbook(path[0] + path[1])
-    print(wb)
     sheet = wb['Sheet']
 
     print('\nExcel file opened.')
@@ -128,9 +132,9 @@ def insertEmailData(emailData,path):
             break
         except PermissionError:
             print('The excel file is open. Please close the file and press enter to try again.')
-            repeat = input()
+            input()
             
-            
+
 # Run this section as a test.
 # ========================================== #
 print('Welcome to the turnaround time analyzer! Please enter the password to begin.')
@@ -141,3 +145,4 @@ data = getAddAndSub(address,pw,plug)
 path = createNewXlsx()
 insertEmailData(data,path)
 # ========================================== #
+
